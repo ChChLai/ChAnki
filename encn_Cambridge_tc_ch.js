@@ -127,8 +127,15 @@ class encn_Cambridge_tc_ch {
     
     async findGoogleTranslate(word) {
         if (!word) return [];
+        
+        function T(node) {
+            if (!node)
+                return '';
+            else
+                return node.innerText.trim();
+        }
 
-        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=' // 'https://dict.GoogleTranslate.com/w/';
+        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text='; // 'https://dict.GoogleTranslate.com/w/';
         // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
         let url = base + encodeURIComponent(word);
         let doc = '';
@@ -147,7 +154,7 @@ class encn_Cambridge_tc_ch {
 
             // get headword and phonetic
             let expression = T(doc.querySelector('span[lang="zh-TW"]')); // headword
-            let definition = expression
+            let definition = expression;
             let reading = '';
     
             let audios = [];
@@ -169,13 +176,7 @@ class encn_Cambridge_tc_ch {
             });
             return notes;
         }
-
-        function T(node) {
-            if (!node)
-                return '';
-            else
-                return node.innerText.trim();
-        }
+        
     }
 
     renderCSS() {
