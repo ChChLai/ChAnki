@@ -129,8 +129,8 @@ class encn_Cambridge_tc_ch {
         if (!word) return [];
 
         let audios = [];
-        audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
-        audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
+        audios[0] = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+        audios[1] = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
 
         let css = `
             <style>
