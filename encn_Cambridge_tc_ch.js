@@ -141,6 +141,7 @@ class encn_Cambridge_tc_ch {
         let doc = '';
         try {
             let data = await api.fetch(url);
+            console.log("data: ", data);
             let parser = new DOMParser();
             doc = parser.parseFromString(data, 'text/html');
             let GoogleTranslate = getGoogleTranslate(doc, word); //Combine GoogleTranslate Concise English-Chinese Dictionary to the end.
