@@ -1,6 +1,6 @@
 /* global api */
-// from: https://github.com/ninja33/ODH/blob/master/src/dict/encn_Cambridge_tc.js
 class encn_Cambridge_tc_ch {
+    // from: https://github.com/ninja33/ODH/blob/master/src/dict/encn_Cambridge_tc.js
     constructor(options) {
         this.options = options;
         this.maxexample = 2;
