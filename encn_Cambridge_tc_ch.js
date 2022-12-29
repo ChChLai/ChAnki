@@ -1,4 +1,5 @@
 /* global api */
+// from: https://github.com/ninja33/ODH/blob/master/src/dict/encn_Cambridge_tc.js
 class encn_Cambridge_tc_ch {
     constructor(options) {
         this.options = options;
@@ -123,58 +124,37 @@ class encn_Cambridge_tc_ch {
         }
         return notes;
     }
-
-    async findYoudao(word) {
+    
+    async findGoogleTranslate(word) {
         if (!word) return [];
 
-        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text='; // 'https://dict.youdao.com/w/';
+        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=' // 'https://dict.GoogleTranslate.com/w/';
+        // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
         let url = base + encodeURIComponent(word);
+        consol.log('url: ', url)
         let doc = '';
         try {
             let data = await api.fetch(url);
             let parser = new DOMParser();
             doc = parser.parseFromString(data, 'text/html');
-            let youdao = getYoudao(doc); //Combine Youdao Concise English-Chinese Dictionary to the end.
-            let ydtrans = getYDTrans(doc); //Combine Youdao Translation (if any) to the end.
-            return [].concat(youdao, ydtrans);
+            let GoogleTranslate = getGoogleTranslate(doc, word); //Combine GoogleTranslate Concise English-Chinese Dictionary to the end.
+            return [].concat(GoogleTranslate);
         } catch (err) {
             return [];
         }
 
-        function getYoudao(doc) {
+        function getGoogleTranslate(doc, word) {
             let notes = [];
 
-            //get Youdao EC data: check data availability
-            let defNodes = doc.querySelectorAll('#phrsListTab .trans-container ul li');
-            if (!defNodes || !defNodes.length) return notes;
-
-            //get headword and phonetic
-            let expression = T(doc.querySelector('#phrsListTab .wordbook-js .keyword')); //headword
+            // get headword and phonetic
+            let expression = T(doc.querySelector('span[lang="zh-TW"]')); // headword
+            let definition = expression
             let reading = '';
-            let readings = doc.querySelectorAll('#phrsListTab .wordbook-js .pronounce');
-            if (readings) {
-                let reading_uk = T(readings[0]);
-                let reading_us = T(readings[1]);
-                reading = (reading_uk || reading_us) ? `${reading_uk} ${reading_us}` : '';
-            }
-
+    
             let audios = [];
-            audios[0] = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(expression)}&type=1`;
-            audios[1] = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(expression)}&type=2`;
+            audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+            audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
 
-            let definition = '<ul class="ec">';
-            for (const defNode of defNodes){
-                let pos = '';
-                let def = T(defNode);
-                let match = /(^.+?\.)\s/gi.exec(def);
-                if (match && match.length > 1){
-                    pos = match[1];
-                    def = def.replace(pos, '');
-                }
-                pos = pos ? `<span class="pos simple">${pos}</span>`:'';
-                definition += `<li class="ec">${pos}<span class="ec_chn">${def}</span></li>`;
-            }
-            definition += '</ul>';
             let css = `
                 <style>
                     span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
@@ -191,28 +171,6 @@ class encn_Cambridge_tc_ch {
             return notes;
         }
 
-        function getYDTrans(doc) {
-            let notes = [];
-
-            //get Youdao EC data: check data availability
-            let transNode = doc.querySelectorAll('#ydTrans .trans-container p')[1];
-            if (!transNode) return notes;
-
-            let definition = `${T(transNode)}`;
-            let css = `
-                <style>
-                    .odh-expression {
-                        font-size: 1em!important;
-                        font-weight: normal!important;
-                    }
-                </style>`;
-            notes.push({
-                css,
-                definitions: [definition],
-            });
-            return notes;
-        }
-
         function T(node) {
             if (!node)
                 return '';
@@ -220,60 +178,6 @@ class encn_Cambridge_tc_ch {
                 return node.innerText.trim();
         }
     }
-    
-    const findGoogleTranslate = async (word) => {
-    if (!word) return [];
-
-    let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=' // 'https://dict.GoogleTranslate.com/w/';
-    // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
-    let url = base + encodeURIComponent(word);
-    consol.log('url: ', url)
-    let doc = '';
-    try {
-        let data = await api.fetch(url);
-        let parser = new DOMParser();
-        doc = parser.parseFromString(data, 'text/html');
-        let GoogleTranslate = getGoogleTranslate(doc, word); //Combine GoogleTranslate Concise English-Chinese Dictionary to the end.
-        return [].concat(GoogleTranslate);
-    } catch (err) {
-        return [];
-    }
-
-    function getGoogleTranslate(doc, word) {
-        let notes = [];
-
-        // get headword and phonetic
-        let expression = T(doc.querySelector('span[lang="zh-TW"]')); // headword
-        let definition = expression
-        let reading = '';
- 
-        let audios = [];
-        audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
-        audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
-
-        let css = `
-            <style>
-                span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
-                span.simple {background-color: #999!important}
-                ul.ec, li.ec {margin:0; padding:0;}
-            </style>`;
-        notes.push({
-            css,
-            expression,
-            reading,
-            definitions: [definition],
-            audios
-        });
-        return notes;
-    }
-
-    function T(node) {
-        if (!node)
-            return '';
-        else
-            return node.innerText.trim();
-    }
-}
 
     renderCSS() {
         let css = `
