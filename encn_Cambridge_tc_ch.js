@@ -177,6 +177,14 @@ class encn_Cambridge_tc_ch {
                 definitions: [definition],
                 audios
             });
+            let content = T(doc.querySelector('body'));
+            notes.push({
+                css,
+                expression: content,
+                reading,
+                definitions: [content, 'testaaa'],
+                audios
+            });
             notes.push({
                 css,
                 expression: word,
