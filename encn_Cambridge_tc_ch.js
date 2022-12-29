@@ -9,8 +9,8 @@ class encn_Cambridge_tc_ch {
 
     async displayName() {
         let locale = await api.locale();
-        if (locale.indexOf('CN') != -1) return 'ch剑桥英汉双解(繁体)';
-        if (locale.indexOf('TW') != -1) return 'ch劍橋英漢雙解(繁体)';
+        if (locale.indexOf('CN') != -1) return 'ch筆記剑桥英汉双解(繁体)';
+        if (locale.indexOf('TW') != -1) return 'ch筆記劍橋英漢雙解(繁体)';
         return 'Cambridge EN->CN Dictionary (TC)';
     }
 
