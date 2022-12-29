@@ -126,6 +126,7 @@ class encn_Cambridge_tc_ch {
     }
     
     async findGoogleTranslate(word) {
+        console.log("findGoogleTranslate-word: ", word);
         if (!word) return [];
         
         function T(node) {
@@ -138,6 +139,7 @@ class encn_Cambridge_tc_ch {
         let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text='; // 'https://dict.GoogleTranslate.com/w/';
         // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
         let url = base + encodeURIComponent(word);
+        console.log("findGoogleTranslate-url: ", url);
         let doc = '';
         try {
             let data = await api.fetch(url);
