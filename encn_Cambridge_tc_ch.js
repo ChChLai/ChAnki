@@ -20,7 +20,7 @@ class encn_Cambridge_tc_ch {
 
     async findTerm(word) {
         this.word = word;
-        let promises = [this.findCambridge(word), this.findYoudao(word)];
+        let promises = [this.findCambridge(word), this.findGoogleTranslate(word)];
         let results = await Promise.all(promises);
         return [].concat(...results).filter(x => x);
     }
@@ -127,7 +127,7 @@ class encn_Cambridge_tc_ch {
     async findYoudao(word) {
         if (!word) return [];
 
-        let base = 'https://dict.youdao.com/w/';
+        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text='; // 'https://dict.youdao.com/w/';
         let url = base + encodeURIComponent(word);
         let doc = '';
         try {
@@ -220,6 +220,60 @@ class encn_Cambridge_tc_ch {
                 return node.innerText.trim();
         }
     }
+    
+    const findGoogleTranslate = async (word) => {
+    if (!word) return [];
+
+    let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=' // 'https://dict.GoogleTranslate.com/w/';
+    // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
+    let url = base + encodeURIComponent(word);
+    consol.log('url: ', url)
+    let doc = '';
+    try {
+        let data = await api.fetch(url);
+        let parser = new DOMParser();
+        doc = parser.parseFromString(data, 'text/html');
+        let GoogleTranslate = getGoogleTranslate(doc, word); //Combine GoogleTranslate Concise English-Chinese Dictionary to the end.
+        return [].concat(GoogleTranslate);
+    } catch (err) {
+        return [];
+    }
+
+    function getGoogleTranslate(doc, word) {
+        let notes = [];
+
+        // get headword and phonetic
+        let expression = T(doc.querySelector('span[lang="zh-TW"]')); // headword
+        let definition = expression
+        let reading = '';
+ 
+        let audios = [];
+        audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+        audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
+
+        let css = `
+            <style>
+                span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
+                span.simple {background-color: #999!important}
+                ul.ec, li.ec {margin:0; padding:0;}
+            </style>`;
+        notes.push({
+            css,
+            expression,
+            reading,
+            definitions: [definition],
+            audios
+        });
+        return notes;
+    }
+
+    function T(node) {
+        if (!node)
+            return '';
+        else
+            return node.innerText.trim();
+    }
+}
 
     renderCSS() {
         let css = `
