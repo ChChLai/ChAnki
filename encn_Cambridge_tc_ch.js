@@ -131,7 +131,6 @@ class encn_Cambridge_tc_ch {
         let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=' // 'https://dict.GoogleTranslate.com/w/';
         // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
         let url = base + encodeURIComponent(word);
-        consol.log('url: ', url)
         let doc = '';
         try {
             let data = await api.fetch(url);
