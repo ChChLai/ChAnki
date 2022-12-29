@@ -1,6 +1,6 @@
 /* global api */
+// from: https://github.com/ninja33/ODH/blob/master/src/dict/encn_Cambridge_tc.js
 class encn_Cambridge_tc_ch {
-    // from: https://github.com/ninja33/ODH/blob/master/src/dict/encn_Cambridge_tc.js
     constructor(options) {
         this.options = options;
         this.maxexample = 2;
@@ -9,8 +9,8 @@ class encn_Cambridge_tc_ch {
 
     async displayName() {
         let locale = await api.locale();
-        if (locale.indexOf('CN') != -1) return 'ch 剑桥英汉双解';
-        if (locale.indexOf('TW') != -1) return 'ch 劍橋英漢雙解';
+        if (locale.indexOf('CN') != -1) return 'ch剑桥英汉双解(繁体)';
+        if (locale.indexOf('TW') != -1) return 'ch劍橋英漢雙解(繁体)';
         return 'Cambridge EN->CN Dictionary (TC)';
     }
 
@@ -21,7 +21,7 @@ class encn_Cambridge_tc_ch {
 
     async findTerm(word) {
         this.word = word;
-        let promises = [this.findCambridge(word), this.findGoogleTranslate(word)];
+        let promises = [this.findCambridge(word), this.termNote(word)];
         let results = await Promise.all(promises);
         return [].concat(...results).filter(x => x);
     }
@@ -125,76 +125,28 @@ class encn_Cambridge_tc_ch {
         return notes;
     }
     
-    async findGoogleTranslate(word) {
-        console.log("findGoogleTranslate-word: ", word);
+    async termNote(word) {
         if (!word) return [];
-        
-        function T(node) {
-            if (!node)
-                return '';
-            else
-                return node.innerText.trim();
-        }
 
-        let base = 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text='; // 'https://dict.GoogleTranslate.com/w/';
-        // 'https://translate.google.com/?sl=en&tl=zh-TW&op=translate&hl=zh-TW&text=';
-        let url = base + encodeURIComponent(word);
-        console.log("findGoogleTranslate-url: ", url);
-        let doc = '';
-        try {
-            let data = await api.fetch(url);
-            console.log("data: ", data);
-            let parser = new DOMParser();
-            doc = parser.parseFromString(data, 'text/html');
-            let GoogleTranslate = getGoogleTranslate(doc, word); //Combine GoogleTranslate Concise English-Chinese Dictionary to the end.
-            return [].concat(GoogleTranslate);
-        } catch (err) {
-            return [];
-        }
+        let audios = [];
+        audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+        audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
 
-        function getGoogleTranslate(doc, word) {
-            let notes = [];
-
-            // get headword and phonetic
-            let expression = T(doc.querySelector('span[lang="zh-TW"]')); // headword
-            let definition = expression;
-            let reading = '';
-    
-            let audios = [];
-            audios[0] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
-            audios[1] = `https://dict.GoogleTranslate.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`;
-
-            let css = `
-                <style>
-                    span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
-                    span.simple {background-color: #999!important}
-                    ul.ec, li.ec {margin:0; padding:0;}
-                </style>`;
-            notes.push({
-                css,
-                expression,
-                reading,
-                definitions: [definition],
-                audios
-            });
-            let content = T(doc.querySelector('body'));
-            notes.push({
-                css,
-                expression: content,
-                reading,
-                definitions: [content, 'testaaa'],
-                audios
-            });
-            notes.push({
-                css,
-                expression: word,
-                reading,
-                definitions: [word],
-                audios
-            });
-            return notes;
-        }
-        
+        let css = `
+            <style>
+                span.pos  {text-transform:lowercase; font-size:0.9em; margin-right:5px; padding:2px 4px; color:white; background-color:#0d47a1; border-radius:3px;}
+                span.simple {background-color: #999!important}
+                ul.ec, li.ec {margin:0; padding:0;}
+            </style>`;
+        let notes = []
+        notes.push({
+            css,
+            expression: word,
+            reading,
+            definitions: [word],
+            audios
+        });
+        return notes;
     }
 
     renderCSS() {
