@@ -142,7 +142,7 @@ class encn_Cambridge_tc_ch {
         notes.push({
             css,
             expression: word,
-            reading,
+            reading: '',
             definitions: [word],
             audios
         });
